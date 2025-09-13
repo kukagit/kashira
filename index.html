@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Тут надо поработать головой Дони)</title>
   <style>
-    /* Общие стили для страницы. Используем flex и grid для
-       размещения боковых картинок и центрального блока. */
     html, body {
       margin: 0;
       padding: 0;
@@ -16,60 +14,37 @@
       background-color: #00a86bd9;
     }
 
-    /* Основная «бумажная» зона — три колонки: две боковые
-       и центральная. Каждая заполняет высоту окна. */
     .letter-wrapper {
       display: grid;
       grid-template-columns: 1fr 2fr 1fr;
       height: 100vh;
     }
 
-    /* Боковые колонки — фоновые изображения. Вы можете заменить
-       эти файлы на свои — например, узор, рамку или любую
-       картинку. */
     .letter-side {
       background-repeat: no-repeat;
       background-position: center;
       background-size: cover;
     }
-    .left-side {
-      background-image: url('side-left.jpg');
+    .left-side { background-image: url('side-left.jpg'); }
+    .right-side { background-image: url('side-right.jpg'); }
+
+    .letter-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+      max-width: 500px;
+      width: 80%;
+      padding: 1.5rem;
+      background: rgba(0, 168, 107, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .right-side {
-      background-image: url('side-right.jpg');
-    }
 
-    /* Центральный блок, куда помещается текст и элементы формы.
-       Полупрозрачный фон создаёт эффект письма. */
-.letter-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+    h1 { margin-top: 0; margin-bottom: 1rem; }
+    p  { margin-top: 0; margin-bottom: 1rem; text-align: center; }
 
-  /* убираем внешний отступ */
-  margin: 0 auto;
-
-  /* делаем блок уже */
-  max-width: 500px;
-  width: 80%;
-
-  padding: 1.5rem;
-  background: rgba(0, 168, 107, 0.95);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-
-    h1 {
-      margin-top: 0;
-      margin-bottom: 1rem;
-    }
-    p {
-      margin-top: 0;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
     button, input[type="text"] {
       font-size: 1rem;
       padding: 0.5rem 1rem;
@@ -82,19 +57,64 @@
       background-color: #00422a;
       color: #fff;
       border: none;
+      transition: background-color .2s;
+    }
+    button:hover { background-color: #005fa3; }
+    .hidden { display: none; }
+
+    /* Стили для всплывающих подсказок */
+    .hint-popup {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      max-width: 400px;
+      width: 80%;
+      padding: 1rem;
+      background: rgba(255,255,255,0.95);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .hint-popup button.close-btn {
+      border: none;
+      background: transparent;
+      position: absolute;
+      top: 0;
+      right: 5px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #333;
+    }
+
+    /* Контейнер для маленьких кнопок */
+    .hint-buttons {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 11;
+    }
+
+    .hint-buttons button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #00422a;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
       transition: background-color 0.2s;
     }
-    button:hover {
-      background-color: #005fa3;
-    }
-    .hidden {
-      display: none;
-    }
+    .hint-buttons button:hover { background-color: #005fa3; }
   </style>
 </head>
 <body>
-  <!-- Аудиоплеер. Указываем два формата для лучшей совместимости.
-       Замените music1.ogg и music1.mp3 на свои файлы. -->
   <audio id="bgmusic" loop>
     <source src="music1.ogg" type="audio/ogg" />
     <source src="music1.mp3" type="audio/mpeg" />
@@ -104,35 +124,41 @@
     <div class="letter-side left-side"></div>
     <div class="letter-content">
       <h1>Добро пожаловать!</h1>
-      <!-- Блок с описанием и кнопкой для старта. По нажатию
-           открывается форма ввода пароля и запускается музыка. -->
       <div id="startContainer">
         <p>Нажмите кнопку, чтобы начать квест.</p>
         <button id="startBtn" onclick="startQuest()">Начать</button>
       </div>
-      <!-- Блок с вводом пароля. Скрыт по умолчанию. -->
       <div id="passwordContainer" class="hidden">
-  <p>.--. ..- ... - -..-  -- .. .-.</p>
-  <input type="text" id="passwordInput" placeholder="Пароль" />
-  <button onclick="checkPassword()">Отправить</button>
-  <!-- Новый текст -->
-  <p style="margin-top:1rem; font-size:0.9rem; color:#000;">
-    Цезрь в 3 году гласил: cнсръгхзоярс
-  </p>
+        <p>.--. ..- ... - -..-  -- .. .-.</p>
+        <input type="text" id="passwordInput" placeholder="Пароль" />
+        <button onclick="checkPassword()">Отправить</button>
         <p style="margin-top:1rem; font-size:0.9rem; color:#000;">
-    a1z26: 9-1-2-21-5-6-20 14-6-15-33
-  </p>
-</div>
-
+          Цезарь в 3 году гласил: cнсръгхзоярс
+        </p>
+        <p style="margin-top:1rem; font-size:0.9rem; color:#000;">
+          a1z26: 9-1-2-21-5-6-20 14-6-15-33
+        </p>
+      </div>
     </div>
     <div class="letter-side right-side"></div>
   </div>
 
+  <!-- Всплывающее окно для подсказок -->
+  <div id="hintPopup" class="hint-popup hidden">
+    <button class="close-btn" onclick="closeHint()">&times;</button>
+    <div id="hintText">Текст подсказки появится здесь</div>
+  </div>
+
+  <!-- Кнопки для подсказок -->
+  <div class="hint-buttons">
+    <button onclick="showHint(1)">1</button>
+    <button onclick="showHint(2)">2</button>
+    <button onclick="showHint(3)">3</button>
+  </div>
+
   <script>
-    // Функция запускает фоновую музыку и открывает форму для ввода пароля.
     function startQuest() {
       const audio = document.getElementById('bgmusic');
-      // Попытка включить музыку после взаимодействия пользователя.
       audio.play().catch(function (error) {
         console.log('Автовоспроизведение заблокировано:', error);
       });
@@ -140,16 +166,32 @@
       document.getElementById('passwordContainer').classList.remove('hidden');
     }
 
-    // Проверка введённого пароля. При успешном вводе выполняется переход.
     function checkPassword() {
       const input = document.getElementById('passwordInput').value.trim().toLowerCase();
-      const correct = 'Пусть мир окончательно забудет меня'; // Здесь можно задать свой пароль
-      if (input === correct) {
-        // Переход на финальную страницу
+      const correct = 'пусть мир окончательно забудет меня';
+      if (input === correct.toLowerCase()) {
         window.location.href = 'congrats.html';
       } else {
         alert('Неверный пароль. Попробуйте снова!');
       }
+    }
+
+    // Тексты для подсказок. Замените на свои варианты
+    const hints = {
+      1: 'Здесь текст для подсказки №1',
+      2: 'Здесь текст для подсказки №2',
+      3: 'Здесь текст для подсказки №3'
+    };
+
+    function showHint(num) {
+      const popup = document.getElementById('hintPopup');
+      const textElement = document.getElementById('hintText');
+      textElement.textContent = hints[num];
+      popup.classList.remove('hidden');
+    }
+
+    function closeHint() {
+      document.getElementById('hintPopup').classList.add('hidden');
     }
   </script>
 </body>
