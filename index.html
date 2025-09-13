@@ -41,17 +41,25 @@
 
     /* Центральный блок, куда помещается текст и элементы формы.
        Полупрозрачный фон создаёт эффект письма. */
-    .letter-content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin: 1rem;
-      padding: 2rem;
-      background: rgba(0, 168, 107, 0.9);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+.letter-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* убираем внешний отступ */
+  margin: 0 auto;
+
+  /* делаем блок уже */
+  max-width: 500px;
+  width: 80%;
+
+  padding: 1.5rem;
+  background: rgba(0, 168, 107, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 
     h1 {
       margin-top: 0;
